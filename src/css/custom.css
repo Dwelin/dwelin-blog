@@ -1,0 +1,379 @@
+/* 自定义样式 - 覆盖 Tailwind 默认样式 */
+
+/* CSS 变量定义 */
+:root {
+  /* 主题色变量 - 可以通过 JavaScript 动态修改 */
+  /* --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a; */
+
+  /* 绿色系 */
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+  --color-primary-800: #166534;
+  --color-primary-900: #14532d;
+}
+
+/* 基础样式重置和自定义 */
+@layer base {
+  /* 自定义滚动条样式 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* 深色模式滚动条 */
+  .dark ::-webkit-scrollbar-track {
+    background: #1e293b;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
+  /* 自定义选择文本样式 */
+  ::selection {
+    background: var(--color-primary-500);
+    color: white;
+  }
+
+  .dark ::selection {
+    background: var(--color-primary-400);
+    color: white;
+  }
+
+  /* 自定义焦点样式 */
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  /* 平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* 自定义字体渲染 */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* 组件样式自定义 */
+@layer components {
+  /* 自定义按钮样式 - 使用主题色 */
+  .btn-primary {
+    @apply px-4 py-2 text-white rounded-lg transition-colors duration-200 font-medium;
+    background-color: var(--color-primary-600);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-700);
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 border rounded-lg transition-colors duration-200 font-medium;
+    border-color: var(--color-primary-300);
+    color: var(--color-primary-700);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-primary-50);
+    border-color: var(--color-primary-400);
+  }
+
+  /* 深色模式按钮 */
+  .dark .btn-secondary {
+    border-color: var(--color-primary-600);
+    color: var(--color-primary-300);
+  }
+
+  .dark .btn-secondary:hover {
+    background-color: var(--color-primary-900);
+    border-color: var(--color-primary-500);
+  }
+
+  /* 自定义卡片样式 */
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-md transition-shadow duration-200;
+  }
+
+  /* 自定义输入框样式 */
+  .input-field {
+    @apply w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent dark:bg-gray-700 dark:text-white;
+    border-color: var(--color-primary-300);
+  }
+
+  .input-field:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 2px var(--color-primary-200);
+  }
+
+  /* 深色模式输入框 */
+  .dark .input-field {
+    border-color: var(--color-primary-600);
+  }
+
+  .dark .input-field:focus {
+    border-color: var(--color-primary-400);
+    box-shadow: 0 0 0 2px var(--color-primary-900);
+  }
+
+  /* 自定义链接样式 */
+  .link-primary {
+    color: var(--color-primary-600);
+    transition: color 0.2s ease;
+  }
+
+  .link-primary:hover {
+    color: var(--color-primary-700);
+    text-decoration: underline;
+  }
+
+  /* 深色模式链接 */
+  .dark .link-primary {
+    color: var(--color-primary-400);
+  }
+
+  .dark .link-primary:hover {
+    color: var(--color-primary-300);
+  }
+
+  /* 自定义标题样式 */
+  .heading-1 {
+    @apply text-4xl md:text-5xl font-bold text-gray-900 dark:text-white;
+  }
+
+  .heading-2 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white;
+  }
+
+  .heading-3 {
+    @apply text-xl font-semibold text-gray-900 dark:text-white;
+  }
+
+  /* 自定义文本样式 */
+  .text-body {
+    @apply text-gray-600 dark:text-gray-300 leading-relaxed;
+  }
+
+  .text-muted {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  /* 主题色文本 */
+  .text-theme {
+    color: var(--color-primary-600);
+  }
+
+  .dark .text-theme {
+    color: var(--color-primary-400);
+  }
+}
+
+/* 工具类自定义 */
+@layer utilities {
+  /* 自定义动画 */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle 0.6s ease-in-out;
+  }
+
+  /* 回到顶部按钮动画 */
+  .animate-back-to-top {
+    animation: backToTop 0.3s ease-out;
+  }
+
+  /* 主题色渐变 */
+  .gradient-theme {
+    background: linear-gradient(135deg, var(--color-primary-500) 0%, var(--color-primary-700) 100%);
+  }
+
+  .gradient-theme-light {
+    background: linear-gradient(135deg, var(--color-primary-400) 0%, var(--color-primary-600) 100%);
+  }
+
+  /* 自定义渐变 */
+  .gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-secondary {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .gradient-success {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  /* 自定义阴影 */
+  .shadow-soft {
+    box-shadow:
+      0 2px 15px -3px rgba(0, 0, 0, 0.07),
+      0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .shadow-theme {
+    box-shadow: 0 0 20px var(--color-primary-500);
+  }
+
+  /* 自定义边框 */
+  .border-gradient {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(white, white) padding-box,
+      linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700)) border-box;
+  }
+
+  .dark .border-gradient {
+    background:
+      linear-gradient(#1f2937, #1f2937) padding-box,
+      linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700)) border-box;
+  }
+
+  /* 主题色背景 */
+  .bg-theme {
+    background-color: var(--color-primary-600);
+  }
+
+  .bg-theme-light {
+    background-color: var(--color-primary-50);
+  }
+
+  .dark .bg-theme-light {
+    background-color: var(--color-primary-900);
+  }
+}
+
+/* 自定义动画关键帧 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceGentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes backToTop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 响应式工具类 */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+/* 深色模式特定样式 */
+.dark {
+  /* 深色模式下的特殊样式 */
+  color-scheme: dark;
+}
+
+/* 打印样式 */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}

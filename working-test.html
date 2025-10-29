@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dwelin Blog - 完整测试</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="app"></div>
+    
+    <script>
+        const { createApp } = Vue;
+        const { createRouter, createWebHistory } = VueRouter;
+        
+        // 首页组件
+        const HomePage = {
+            template: `
+                <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+                    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-200 dark:border-gray-700">
+                        <nav class="flex items-center justify-between max-w-6xl mx-auto px-4 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-xl text-gray-800 dark:text-white">Dwelin</span>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <router-link to="/" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">首页</router-link>
+                                <router-link to="/articles" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">文章</router-link>
+                                <router-link to="/about" class="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">关于</router-link>
+                            </div>
+                        </nav>
+                    </header>
+                    
+                    <main class="container pt-4 pb-8">
+                        <div class="space-y-12">
+                            <section class="text-center py-16 px-4">
+                                <div class="max-w-4xl mx-auto">
+                                    <h1 class="text-5xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white">
+                                        欢迎来到 <span class="text-green-600 dark:text-green-400">Dwelin</span> 的博客
+                                    </h1>
+                                    <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+                                        愿你有前进一寸的勇气，亦有后退一尺的从容
+                                    </p>
+                                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                        <router-link to="/articles" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                                            浏览文章
+                                        </router-link>
+                                        <router-link to="/about" class="px-8 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors font-medium">
+                                            了解更多
+                                        </router-link>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                            <section class="py-12 bg-gray-50 dark:bg-gray-800/50">
+                                <div class="max-w-6xl mx-auto px-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                                        <div class="space-y-2">
+                                            <div class="text-4xl font-bold text-blue-600 dark:text-blue-400">12</div>
+                                            <div class="text-gray-600 dark:text-gray-300">发布文章</div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-4xl font-bold text-green-600 dark:text-green-400">1,234</div>
+                                            <div class="text-gray-600 dark:text-gray-300">总浏览量</div>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="text-4xl font-bold text-purple-600 dark:text-purple-400">8</div>
+                                            <div class="text-gray-600 dark:text-gray-300">标签总数</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </main>
+                    
+                    <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-8">
+                        <div class="max-w-6xl mx-auto px-4 py-8">
+                            <div class="text-center">
+                                <p class="text-gray-600 dark:text-gray-300 mb-2">愿你有前进一寸的勇气，亦有后退一尺的从容</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Dwelin © 2025 | 粤ICP备2022117022号
+                                </p>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            `
+        };
+        
+        // 文章页面组件
+        const ArticlesPage = {
+            template: `
+                <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8">文章列表</h1>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                            <p class="text-gray-600 dark:text-gray-300">文章功能正在开发中...</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+        
+        // 关于页面组件
+        const AboutPage = {
+            template: `
+                <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8">关于我</h1>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                            <p class="text-gray-600 dark:text-gray-300">关于页面正在开发中...</p>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+        
+        // 创建路由
+        const router = createRouter({
+            history: createWebHistory(),
+            routes: [
+                { path: '/', component: HomePage },
+                { path: '/articles', component: ArticlesPage },
+                { path: '/about', component: AboutPage }
+            ]
+        });
+        
+        // 创建应用
+        const app = createApp({
+            template: '<router-view />'
+        });
+        
+        app.use(router);
+        app.mount('#app');
+        
+        console.log('Dwelin Blog 完整应用已加载');
+    </script>
+</body>
+</html>
