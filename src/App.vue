@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
     <Navbar />
-    <main class="container pt-4 pb-8">
+    <main class="container mx-auto pt-4 pb-8 max-w-screen-xl">
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
           <component :is="Component" />

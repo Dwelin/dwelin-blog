@@ -354,7 +354,7 @@
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (max-width: 1279px) {
   .container {
     padding-left: 4rem;
     padding-right: 4rem;
