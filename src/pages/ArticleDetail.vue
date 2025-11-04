@@ -141,9 +141,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { ApiService } from "../config/api";
+import hljs from "highlight.js";
+// 导入代码高亮样式，根据主题选择
+import "highlight.js/styles/github-dark.css";
+// 备用：如果需要浅色主题，可以使用 github.css
 
 // 定义类型
 interface Article {
@@ -193,6 +197,28 @@ const newComment = ref("");
 const loading = ref(false);
 const error = ref("");
 
+// 处理代码高亮
+const highlightCode = () => {
+  nextTick(() => {
+    const articleContent = document.querySelector(".prose");
+    if (articleContent) {
+      // 查找所有代码块
+      const codeBlocks = articleContent.querySelectorAll("pre code");
+      codeBlocks.forEach((block) => {
+        // 如果还没有被高亮处理过
+        if (!block.classList.contains("hljs")) {
+          try {
+            hljs.highlightElement(block as HTMLElement);
+          } catch (error) {
+            // 如果高亮失败，至少保持代码块样式
+            console.warn("代码高亮失败:", error);
+          }
+        }
+      });
+    }
+  });
+};
+
 // 加载文章
 const loadArticle = async () => {
   try {
@@ -201,6 +227,11 @@ const loadArticle = async () => {
     const response = (await ApiService.getPost(route.params.id as string)) as ApiResponse<ArticleResponse>;
     article.value = response.data.post || null;
     relatedArticles.value = response.data.related_posts || [];
+    
+    // 文章加载完成后处理代码高亮，延迟执行确保 DOM 更新完成
+    setTimeout(() => {
+      highlightCode();
+    }, 100);
   } catch (err: any) {
     error.value = err.message || "获取文章失败";
   } finally {
@@ -280,6 +311,18 @@ watch(
     }
   }
 );
+
+// 监听文章内容变化，重新处理代码高亮
+watch(
+  () => article.value?.content,
+  () => {
+    // 延迟执行，确保 DOM 完全更新
+    setTimeout(() => {
+      highlightCode();
+    }, 100);
+  },
+  { flush: "post" }
+);
 </script>
 
 <style scoped>
@@ -312,11 +355,94 @@ watch(
   @apply mb-4;
 }
 
-.prose pre {
-  @apply text-sm;
+/* 行内代码样式 */
+.prose code {
+  @apply bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono;
+  color: #e83e8c;
 }
 
-.prose code {
-  @apply bg-gray-100 dark:bg-gray-700 px-1 py-0.5 rounded text-sm;
+.dark .prose code {
+  color: #f472b6;
+}
+
+/* 代码块样式 */
+.prose pre {
+  @apply bg-gray-900 dark:bg-gray-950 rounded-lg p-4 overflow-x-auto mb-4 text-sm;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0 text-gray-100;
+  color: inherit;
+  font-size: 0.875rem;
+  line-height: 1.75;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  display: block;
+  overflow-x: auto;
+}
+
+/* 代码块内的行内代码不应该有背景色 */
+.prose pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Highlight.js 样式覆盖 */
+.prose pre code.hljs {
+  @apply bg-transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.prose pre .hljs {
+  @apply bg-transparent;
+  padding: 0;
+}
+
+/* 深色模式下的代码高亮样式调整 */
+.dark .prose pre {
+  background-color: #0d1117;
+}
+
+.dark .prose pre code {
+  color: #c9d1d9;
+}
+
+/* 确保代码块可以横向滚动 */
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* 代码块滚动条样式 */
+.prose pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.prose pre::-webkit-scrollbar-track {
+  @apply bg-gray-800 dark:bg-gray-900 rounded;
+}
+
+.prose pre::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 dark:bg-gray-700 rounded;
+}
+
+.prose pre::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500 dark:bg-gray-600;
+}
+
+/* 代码块行号容器（如果后端返回了行号） */
+.prose pre .line-numbers {
+  @apply text-gray-500 dark:text-gray-400 mr-4 select-none;
+}
+
+/* 代码块语言标签 - 如果 pre 有 data-language 属性则显示 */
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  @apply absolute top-2 right-2 text-xs text-gray-400 dark:text-gray-500 uppercase px-2 py-1 bg-gray-800 dark:bg-gray-900 rounded;
+  font-family: sans-serif;
+  z-index: 1;
 }
 </style>
