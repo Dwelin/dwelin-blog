@@ -144,10 +144,23 @@
 import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { ApiService } from "../config/api";
-import hljs from "highlight.js";
 // 导入代码高亮样式，根据主题选择
 import "highlight.js/styles/github-dark.css";
 // 备用：如果需要浅色主题，可以使用 github.css
+
+// 动态导入 highlight.js 以避免构建时的解析问题
+let hljs: any = null;
+const loadHighlightJs = async () => {
+  if (!hljs) {
+    try {
+      const hljsModule = await import("highlight.js");
+      hljs = hljsModule.default || hljsModule;
+    } catch (error) {
+      console.error("加载 highlight.js 失败:", error);
+    }
+  }
+  return hljs;
+};
 
 // 定义类型
 interface Article {
@@ -265,7 +278,14 @@ const copyCode = async (codeText: string, button: HTMLElement) => {
 };
 
 // 处理代码高亮和添加复制按钮
-const highlightCode = () => {
+const highlightCode = async () => {
+  // 确保 highlight.js 已加载
+  const hljsInstance = await loadHighlightJs();
+  if (!hljsInstance) {
+    console.warn("highlight.js 未加载，跳过代码高亮");
+    return;
+  }
+
   nextTick(() => {
     const articleContent = document.querySelector(".prose");
     if (articleContent) {
@@ -282,7 +302,7 @@ const highlightCode = () => {
           // 代码高亮
           if (!codeBlock.classList.contains("hljs")) {
             try {
-              hljs.highlightElement(codeBlock as HTMLElement);
+              hljsInstance.highlightElement(codeBlock as HTMLElement);
             } catch (error) {
               console.warn("代码高亮失败:", error);
             }
@@ -314,7 +334,6 @@ const highlightCode = () => {
             copyButton.style.position = "absolute";
             copyButton.style.top = "8px";
             copyButton.style.right = "8px";
-            copyButton.style.zIndex = "100";
             copyButton.style.height = "32px";
             copyButton.style.width = "32px";
             copyButton.style.minHeight = "32px";
@@ -362,8 +381,8 @@ const loadArticle = async () => {
     relatedArticles.value = response.data.related_posts || [];
     
     // 文章加载完成后处理代码高亮和复制按钮，延迟执行确保 DOM 更新完成
-    setTimeout(() => {
-      highlightCode();
+    setTimeout(async () => {
+      await highlightCode();
     }, 100);
   } catch (err: any) {
     error.value = err.message || "获取文章失败";
@@ -450,8 +469,8 @@ watch(
   () => article.value?.content,
   () => {
     // 延迟执行，确保 DOM 完全更新
-    setTimeout(() => {
-      highlightCode();
+    setTimeout(async () => {
+      await highlightCode();
     }, 100);
   },
   { flush: "post" }

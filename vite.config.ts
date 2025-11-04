@@ -87,7 +87,7 @@ export default defineConfig(({ mode }) => {
     },
     publicDir: "public",
     optimizeDeps: {
-      include: ["vue", "vue-router"],
+      include: ["vue", "vue-router", "highlight.js"],
       force: false
     }
   };
