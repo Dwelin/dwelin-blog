@@ -1,5 +1,5 @@
 <template>
-  <div v-if="article" class="max-w-4xl mx-auto">
+  <div v-if="article" class="max-w-5xl mx-auto">
     <!-- Article Header -->
     <header class="mb-8">
       <div class="flex items-center gap-2 mb-4">
@@ -45,11 +45,11 @@
     <!-- Article Content -->
     <article class="prose prose-lg dark:prose-invert max-w-none mb-12">
       <div class="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-        <div class="text-center mb-8">
+        <div class="text-center mb-8" v-if="article?.thumbnail_url">
           <img :src="article?.thumbnail_url" alt="文章封面" class="w-full h-64 object-cover rounded-md" />
         </div>
-        <div class="space-y-6 text-gray-700 dark:text-gray-300 leading-loose">
-          <div v-html="article?.content || ''"></div>
+        <div class="article-content-wrapper">
+          <div class="w-e-text-container" v-html="article?.content || ''"></div>
         </div>
       </div>
     </article>
@@ -133,7 +133,7 @@
   </div>
 
   <!-- Loading State -->
-  <div v-else class="max-w-4xl mx-auto text-center py-12">
+  <div v-else class="max-w-5xl mx-auto text-center py-12">
     <div class="text-6xl mb-4">📝</div>
     <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-2">加载中...</h2>
     <p class="text-gray-600 dark:text-gray-300">正在获取文章内容</p>
@@ -144,6 +144,8 @@
 import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { ApiService } from "../config/api";
+// 导入 WangEditor 内容显示样式
+import "../styles/wangeditor-content.css";
 // 导入代码高亮样式，根据主题选择
 import "highlight.js/styles/github-dark.css";
 // 备用：如果需要浅色主题，可以使用 github.css
@@ -287,7 +289,7 @@ const highlightCode = async () => {
   }
 
   nextTick(() => {
-    const articleContent = document.querySelector(".prose");
+    const articleContent = document.querySelector(".w-e-text-container") || document.querySelector(".article-content") || document.querySelector(".prose");
     if (articleContent) {
       // 查找所有代码块
       const preBlocks = articleContent.querySelectorAll("pre");
@@ -478,6 +480,7 @@ watch(
 </script>
 
 <style scoped>
+/* 工具类 */
 .line-clamp-1 {
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -491,138 +494,253 @@ watch(
   overflow: hidden;
 }
 
-.prose {
-  @apply text-gray-700 dark:text-gray-300;
+/* 文章内容容器 */
+.article-content-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.prose h2 {
-  @apply text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4;
-}
+/* 代码高亮和复制按钮样式 - 保留用于代码块功能 */
 
-.prose h3 {
-  @apply text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3;
-}
-
-.prose p {
-  @apply mb-4;
-}
-
-/* 行内代码样式 */
-.prose code {
-  @apply bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono;
-  color: #e83e8c;
-}
-
-.dark .prose code {
-  color: #f472b6;
-}
-
-/* 代码块样式 */
-.prose pre {
-  @apply bg-gray-900 dark:bg-gray-950 rounded-lg p-4 mb-4 text-sm;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+/* 代码块样式增强 - 用于代码高亮和复制功能 */
+.w-e-text-container pre,
+.article-content pre {
   position: relative !important;
-  overflow-x: auto;
-  overflow-y: visible;
   isolation: isolate;
+  /* 优化代码显示清晰度 */
+  font-size: 14px !important;
+  line-height: 1.7 !important;
+  padding: 16px 20px !important;
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  border: 1px solid #3a3a3a !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', 'Consolas', 'Courier New', monospace !important;
 }
 
-.prose pre code {
-  @apply bg-transparent p-0 text-gray-100;
-  color: inherit;
-  font-size: 0.875rem;
-  line-height: 1.75;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  display: block;
-  overflow-x: auto;
-  overflow-y: visible;
+.dark .w-e-text-container pre,
+.dark .article-content pre {
+  background-color: #1e1e1e !important;
+  border-color: #3a3a3a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* 代码块内的行内代码不应该有背景色 */
-.prose pre code {
-  background: transparent;
+/* 代码块内的代码元素 */
+.w-e-text-container pre code,
+.article-content pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  font-weight: normal !important;
+  display: block !important;
+  white-space: pre !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+}
+
+/* Highlight.js 样式覆盖 - 确保代码高亮清晰 */
+.w-e-text-container pre code.hljs,
+.article-content pre code.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+  display: block !important;
+}
+
+.w-e-text-container pre .hljs,
+.article-content pre .hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  color: inherit !important;
+}
+
+/* 优化高亮后的代码颜色对比度 */
+.w-e-text-container pre .hljs-keyword,
+.article-content pre .hljs-keyword {
+  color: #569cd6 !important;
+  font-weight: 500 !important;
+}
+
+.w-e-text-container pre .hljs-string,
+.article-content pre .hljs-string {
+  color: #ce9178 !important;
+}
+
+.w-e-text-container pre .hljs-comment,
+.article-content pre .hljs-comment {
+  color: #6a9955 !important;
+  font-style: italic !important;
+}
+
+.w-e-text-container pre .hljs-number,
+.article-content pre .hljs-number {
+  color: #b5cea8 !important;
+}
+
+.w-e-text-container pre .hljs-function,
+.article-content pre .hljs-function {
+  color: #dcdcaa !important;
+}
+
+.w-e-text-container pre .hljs-variable,
+.article-content pre .hljs-variable {
+  color: #9cdcfe !important;
+}
+
+.w-e-text-container pre .hljs-title,
+.article-content pre .hljs-title {
+  color: #4ec9b0 !important;
+}
+
+/* 代码块滚动条样式 - 优化显示 */
+.w-e-text-container pre::-webkit-scrollbar,
+.article-content pre::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+.w-e-text-container pre::-webkit-scrollbar-track,
+.article-content pre::-webkit-scrollbar-track {
+  background: #2a2a2a;
+  border-radius: 5px;
+  margin: 4px;
+}
+
+.dark .w-e-text-container pre::-webkit-scrollbar-track,
+.dark .article-content pre::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+.w-e-text-container pre::-webkit-scrollbar-thumb,
+.article-content pre::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 5px;
+  border: 2px solid #2a2a2a;
+}
+
+.dark .w-e-text-container pre::-webkit-scrollbar-thumb,
+.dark .article-content pre::-webkit-scrollbar-thumb {
+  background: #5a5a5a;
+  border-color: #1a1a1a;
+}
+
+.w-e-text-container pre::-webkit-scrollbar-thumb:hover,
+.article-content pre::-webkit-scrollbar-thumb:hover {
+  background: #6a6a6a;
+}
+
+.dark .w-e-text-container pre::-webkit-scrollbar-thumb:hover,
+.dark .article-content pre::-webkit-scrollbar-thumb:hover {
+  background: #7a7a7a;
+}
+
+/* 代码块行号容器 */
+.w-e-text-container pre .line-numbers,
+.article-content pre .line-numbers {
+  color: #999;
+  margin-right: 1rem;
+  user-select: none;
+}
+
+/* 复制按钮样式 - 固定在代码块右上角 */
+.w-e-text-container pre .copy-code-button,
+.article-content pre .copy-code-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  background-color: rgba(55, 65, 81, 0.9);
+  color: rgba(209, 213, 219, 0.9);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
+  margin: 0;
+  line-height: 1;
+  font-size: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s, transform 0.2s;
+  opacity: 0.7;
+  border: none;
+  z-index: 10;
 }
 
-/* Highlight.js 样式覆盖 */
-.prose pre code.hljs {
-  @apply bg-transparent;
-  padding: 0;
-}
-
-.prose pre .hljs {
-  @apply bg-transparent;
-  padding: 0;
-}
-
-/* 确保代码块可以横向滚动，但按钮不被裁剪 */
-.prose pre {
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-}
-
-/* 代码块滚动条样式 */
-.prose pre::-webkit-scrollbar {
-  height: 8px;
-}
-
-.prose pre::-webkit-scrollbar-track {
-  @apply bg-gray-800 dark:bg-gray-900 rounded;
-}
-
-.prose pre::-webkit-scrollbar-thumb {
-  @apply bg-gray-600 dark:bg-gray-700 rounded;
-}
-
-.prose pre::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500 dark:bg-gray-600;
-}
-
-/* 代码块行号容器（如果后端返回了行号） */
-.prose pre .line-numbers {
-  @apply text-gray-500 dark:text-gray-400 mr-4 select-none;
-}
-
-/* 复制按钮样式 - 固定在代码块右上角，悬停显示 */
-.prose pre .copy-code-button {
-  border-color: rgba(245, 157, 157, 0.2);
-}
-
-.prose pre:hover .copy-code-button {
+.w-e-text-container pre:hover .copy-code-button,
+.article-content pre:hover .copy-code-button {
   opacity: 1;
   pointer-events: auto;
 }
 
-.prose pre .copy-code-button:hover {
+.w-e-text-container pre .copy-code-button:hover,
+.article-content pre .copy-code-button:hover {
   background-color: rgba(55, 65, 81, 1);
   color: rgba(243, 244, 246, 1);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  border-color: rgba(245, 157, 157, 0.2);
 }
 
-.prose pre .copy-code-button:active {
+.w-e-text-container pre .copy-code-button:active,
+.article-content pre .copy-code-button:active {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.prose pre .copy-code-button svg {
+.w-e-text-container pre .copy-code-button svg,
+.article-content pre .copy-code-button svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
 }
 
-/* 代码块语言标签 - 如果 pre 有 data-language 属性则显示 */
-.prose pre[data-language]::before {
+/* 代码块语言标签 */
+.w-e-text-container pre[data-language]::before,
+.article-content pre[data-language]::before {
   content: attr(data-language);
-  @apply absolute top-2 right-10 text-xs text-gray-400 dark:text-gray-500 uppercase px-2 py-1 bg-gray-800 dark:bg-gray-900 rounded;
+  position: absolute;
+  top: 8px;
+  right: 48px;
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  background-color: #2a2a2a;
+  border-radius: 4px;
   font-family: sans-serif;
   z-index: 1;
 }
 
-/* 如果有语言标签，确保复制按钮在语言标签左侧 */
-.prose pre[data-language] .copy-code-button {
+.dark .w-e-text-container pre[data-language]::before,
+.dark .article-content pre[data-language]::before {
+  background-color: #1e1e1e;
+  color: #999;
+}
+
+.w-e-text-container pre[data-language] .copy-code-button,
+.article-content pre[data-language] .copy-code-button {
   right: 8px;
+}
+
+/* 表格响应式处理 - 移动端横向滚动 */
+@media (max-width: 768px) {
+  .w-e-text-container table,
+  .article-content table {
+    min-width: 600px;
+    font-size: 13px;
+  }
+  
+  .w-e-text-container table th,
+  .w-e-text-container table td,
+  .article-content table th,
+  .article-content table td {
+    padding: 6px 8px;
+  }
 }
 </style>
