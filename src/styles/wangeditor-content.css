@@ -382,3 +382,29 @@
 .dark .w-e-text-container figcaption {
   color: #999;
 }
+
+/* =========================
+ * 表格边框兜底（解决 SPA 跳转偶发无边框）
+ * - 有些内容可能带内联 border:0 或被全局 reset 覆盖
+ * - 使用 !important 确保边框稳定显示
+ * ========================= */
+.w-e-text-container table {
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #ddd !important;
+}
+
+.w-e-text-container table th,
+.w-e-text-container table td {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: #ddd !important;
+}
+
+.dark .w-e-text-container table,
+.dark .w-e-text-container table th,
+.dark .w-e-text-container table td {
+  border-color: #555 !important;
+}
