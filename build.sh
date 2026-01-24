@@ -88,6 +88,40 @@ fi
 BUILD_SIZE=$(du -sh dist | cut -f1)
 log_success "构建完成！构建产物大小: $BUILD_SIZE"
 
+# 构建产物一致性校验：index.html 引用的 /assets/... 必须存在
+log_info "校验构建产物一致性（index.html 引用资源必须存在）..."
+if [ ! -f "dist/index.html" ]; then
+    log_error "dist/index.html 不存在"
+    exit 1
+fi
+
+MISSING=0
+while IFS= read -r asset; do
+    [ -z "$asset" ] && continue
+    REL="${asset#/}" # strip leading '/'
+    if [ ! -f "dist/$REL" ]; then
+        log_error "index.html 引用了不存在的文件：$asset"
+        MISSING=1
+    fi
+done < <(sed -nE 's/.*(href|src)="(\/assets\/[^"]+)".*/\2/p' dist/index.html | sort -u)
+
+if [ "$MISSING" -ne 0 ]; then
+    log_error "构建产物不一致：请检查构建/上传流程（常见原因：发布中断或 dist 未完整同步）"
+    exit 1
+fi
+
+log_success "构建产物一致性校验通过"
+
+# 输出一个可追踪的版本信息文件，便于线上排查“命中哪个版本”
+BUILD_TS="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+GIT_SHA="unknown"
+if command -v git &> /dev/null; then
+    GIT_SHA="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
+fi
+cat > dist/.build-meta.json <<EOF
+{"built_at":"${BUILD_TS}","git":"${GIT_SHA}"}
+EOF
+
 # 显示构建结果
 echo ""
 log_info "构建产物详情："
