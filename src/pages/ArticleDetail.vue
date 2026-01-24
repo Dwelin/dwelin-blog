@@ -144,8 +144,6 @@
 import { ref, computed, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { ApiService } from "../config/api";
-// 导入 WangEditor 内容显示样式
-import "../styles/wangeditor-content.css";
 // 导入代码高亮样式，根据主题选择
 import "highlight.js/styles/github-dark.css";
 // 备用：如果需要浅色主题，可以使用 github.css
@@ -483,12 +481,14 @@ watch(
 /* 工具类 */
 .line-clamp-1 {
   display: -webkit-box;
+  line-clamp: 1;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 .line-clamp-2 {
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
