@@ -210,44 +210,6 @@ const newComment = ref("");
 const loading = ref(false);
 const error = ref("");
 
-// 兜底：强制修复富文本表格边框（解决 SPA 跳转偶发边框不显示，刷新后才恢复的问题）
-const forceFixTableBorders = () => {
-  const container =
-    (document.querySelector(".w-e-text-container") as HTMLElement | null) ||
-    (document.querySelector(".article-content") as HTMLElement | null) ||
-    (document.querySelector(".prose") as HTMLElement | null);
-
-  if (!container) return;
-
-  const isDark = document.documentElement.classList.contains("dark");
-  const borderColor = isDark ? "#555" : "#ddd";
-  const headerBg = isDark ? "#2a2a2a" : "#f5f5f5";
-
-  // 只处理文章富文本区域内的表格，避免误伤页面其它 table
-  const tables = container.querySelectorAll(".w-e-text-container table, table");
-  tables.forEach((table) => {
-    const el = table as HTMLElement;
-    el.style.setProperty("border-collapse", "collapse", "important");
-    el.style.setProperty("border-spacing", "0", "important");
-    el.style.setProperty("border", `1px solid ${borderColor}`, "important");
-  });
-
-  const cells = container.querySelectorAll(".w-e-text-container th, .w-e-text-container td, th, td");
-  cells.forEach((cell) => {
-    const el = cell as HTMLElement;
-    el.style.setProperty("border", `1px solid ${borderColor}`, "important");
-  });
-
-  const headers = container.querySelectorAll(".w-e-text-container th, th");
-  headers.forEach((th) => {
-    const el = th as HTMLElement;
-    // 只补背景色，避免覆盖编辑器自定义表头颜色（如果有）
-    if (!el.style.backgroundColor) {
-      el.style.setProperty("background-color", headerBg, "important");
-    }
-  });
-};
-
 // 复制代码到剪贴板
 const copyCode = async (codeText: string, button: HTMLElement) => {
   try {
@@ -406,14 +368,6 @@ const highlightCode = async () => {
         }
       });
     }
-
-    // 代码块处理结束后，再兜底修复表格边框（路由跳转偶发问题）
-    // 用双 RAF 确保过渡动画/布局稳定后再应用，避免“看起来没生效”
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        forceFixTableBorders();
-      });
-    });
   });
 };
 
