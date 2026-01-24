@@ -104,11 +104,34 @@ assert_dist_consistent
 info "✅ dist 构建产物校验通过"
 
 if [ -z "$DEPLOY_DIR" ]; then
-  warn "未设置 DEPLOY_DIR：仅完成构建与校验。"
-  echo ""
-  echo "如需部署到服务器目录："
-  echo "  DEPLOY_DIR=/var/www/html/dwelin/dwelin-blog/dist ./deploy.sh"
-  exit 0
+  # 尝试在服务器上自动识别常见部署目录（不影响本地）
+  CANDIDATES=(
+    "/var/www/html/dwelin-blog/dist"         # 你当前线上 nginx root
+    "/var/www/html/dwelin/dwelin-blog/dist"   # 与仓库里的 nginx.conf 一致
+    "/var/www/html/dwelin-blog/dist"
+    "/var/www/html/blog"
+    "/var/www/html"
+  )
+
+  for c in "${CANDIDATES[@]}"; do
+    # 目录存在或者其父目录存在都可以作为部署目标（脚本会 mkdir -p）
+    if [ -d "$c" ] || [ -d "$(dirname "$c")" ]; then
+      DEPLOY_DIR="$c"
+      break
+    fi
+  done
+
+  if [ -z "$DEPLOY_DIR" ]; then
+    warn "未设置 DEPLOY_DIR：仅完成构建与校验。"
+    echo ""
+    echo "如需部署到服务器目录（建议与 nginx root 保持一致）："
+    echo "  DEPLOY_DIR=/var/www/html/dwelin/dwelin-blog/dist ./deploy.sh"
+    echo "  # 或"
+    echo "  DEPLOY_DIR=/var/www/html/dwelin-blog/dist ./deploy.sh"
+    exit 0
+  fi
+
+  info "未显式设置 DEPLOY_DIR，已自动选择：${DEPLOY_DIR}"
 fi
 
 info "📤 部署目录：${DEPLOY_DIR}"
